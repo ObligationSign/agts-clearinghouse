@@ -19,7 +19,6 @@ decision → record → immutable history → verifiable truth
 | Document | Status | Description |
 |---|---|---|
 | [AGTS_CLEARINGHOUSE_SPEC.md](AGTS_CLEARINGHOUSE_SPEC.md) | NORMATIVE | Clearinghouse protocol specification — governance client layer |
-| [AGTS-TERMS.md](AGTS-TERMS.md) | NORMATIVE | Terminology and definitions for the AGTS suite |
 | [PROTOCOL_DIAGRAMS.md](PROTOCOL_DIAGRAMS.md) | INFORMATIVE | Architecture diagrams and protocol visualizations |
 
 ## Protocol Layers
