@@ -587,57 +587,11 @@ An auditor can traverse this chain from any billing event to its governance reco
 
 ---
 
-## §13 Plugin Interface Contract
+## §13 Plugin Interface
 
-A plugin is a component implementing five methods. The AGTS contract requires plugins to produce AGTS-formatted evidence when emitting governance measurements.
+Plugins are components that produce AGTS-formatted governance evidence. A conforming plugin MUST implement a registration interface, a governance evidence emission callback, and lifecycle state transitions. The plugin interface contract, method signatures, and evidence schema are provided to licensed integrators under separate agreement.
 
-### §13.1 Required plugin methods
-
-| Method | Signature | Purpose |
-|---|---|---|
-| `name` | getter | Unique identifier for this plugin domain |
-| `initialize` | `async (onMeasurement) => void` | Called once on registration; receives measurement callback |
-| `getStatus` | `() => { name, initialized, lifecycleState }` | Synchronous status check |
-| `onMessage` | `async (msg, sender) => any` | Message handler for inter-plugin communication |
-| `destroy` | `() => void` | Cleanup on shutdown |
-
-### §13.2 Governance evidence emission
-
-When a plugin has completed a governed action, it MUST emit governance evidence in AGTS format via the `onMeasurement` callback:
-
-```json
-{
-  "type":               "agts_governance_evidence",
-  "measurement_source": "PLUGIN",
-  "plugin":             "<plugin name>",
-  "timestamp":          "<ISO-8601 UTC>",
-  "proof_bundle": {
-    "dataset_provenance_hash":     "<sha256>",
-    "evaluation_trace_hash":       "<sha256>",
-    "ablation_execution_log_hash": "<sha256>",
-    "capability_certificate_hash": "<sha256>",
-    "gate_results": {
-      "G1": { "result": "PASS", "confidence_interval_lower": 0.0, "confidence_interval_upper": 1.0 },
-      "G2": { "result": "PASS", "causal_attribution": true },
-      "G3": { "result": "PASS", "protected_metrics": {} },
-      "G4": { "result": "PASS", "evidence_class": "HOOKED" },
-      "G5": { "result": "PASS", "operator_id": "<DHO identifier>" }
-    }
-  }
-}
-```
-
-The clearinghouse assembles the full `AGTS_PROOF_BUNDLE_V1` from this input, adds system-level fields (`subject_id`, `parent_bundle_hash`, `state_before_hash`, `state_after_hash`), and proceeds with the validator network round.
-
-### §13.3 Plugin lifecycle states
-
-| State | AGTS meaning |
-|---|---|
-| `PROPOSED` | Registered, not yet active |
-| `ACTIVE` | Producing governance evidence normally |
-| `QUARANTINE` | Degraded — 3+ consecutive gate failures — Governance Envelope issuance suspended |
-| `LOCKBOX` | Suspended — 10+ consecutive failures — audit preservation mode |
-| `REJECTED` | Permanent policy violation — cannot reactivate |
+Plugins transition through five lifecycle states: PROPOSED → ACTIVE → QUARANTINE → LOCKBOX → REJECTED. The clearinghouse enforces automatic state transitions based on consecutive gate failure counts.
 
 ---
 
