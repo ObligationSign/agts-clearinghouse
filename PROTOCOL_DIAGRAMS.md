@@ -1264,18 +1264,17 @@ The variance classification drives a nudge update to the HCE observables, closin
 
 Variance Record classification
        │
-       ├── NOMINAL   → H +0.015  C +0.015  E −0.010
+       ├── NOMINAL   → positive H/C nudge, negative E nudge
        │                (execution confirmed governance quality)
        │
-       ├── DEVIATED  → H −0.025  C −0.020  E +0.025
+       ├── DEVIATED  → negative H/C nudge, positive E nudge
        │                (operational tolerance; degrading trend)
        │
-       └── BREACHED  → H −0.070  C −0.050  E +0.070
-                        (governance gap; significant penalty)
+       └── BREACHED  → significant negative H/C nudge, significant positive E nudge
+                        (governance gap; corrective action)
                                 │
                                 ▼
                     HCE Evidence Engine
-                    (addMeasurement → running weighted average)
                                 │
                                 ▼
                     H / C / E observables updated
