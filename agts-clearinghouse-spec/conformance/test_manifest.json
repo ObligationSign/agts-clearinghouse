@@ -1,0 +1,80 @@
+{
+  "description": "AGTS V1 Conformance Test Manifest",
+  "version": "1.0",
+  "valid": [
+    {
+      "file": "valid/envelope_default_pass.json",
+      "type": "envelope",
+      "expected": "PASS",
+      "description": "Two-plugin envelope with DEFAULT profile, all thresholds met"
+    },
+    {
+      "file": "valid/envelope_strict_review.json",
+      "type": "envelope",
+      "expected": "PASS",
+      "description": "Two-plugin envelope with STRICT profile, falls into REVIEW zone"
+    },
+    {
+      "file": "valid/envelope_block_synthetic.json",
+      "type": "envelope",
+      "expected": "PASS",
+      "description": "Single synthetic BLOCK result (fail-closed)"
+    },
+    {
+      "file": "valid/envelope_empty_plugins.json",
+      "type": "envelope",
+      "expected": "PASS",
+      "description": "Empty plugins array defaults to REVIEW"
+    },
+    {
+      "file": "valid/bundle_minimal.json",
+      "type": "bundle",
+      "expected": "PASS",
+      "description": "Minimal valid sovereign bundle"
+    }
+  ],
+  "invalid": [
+    {
+      "file": "invalid/envelope_missing_fields.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["envelope.schema", "envelope.verdict_valid", "envelope.final_state_valid", "envelope.execution_valid", "envelope.verdict_consistency", "envelope.requires_review"],
+      "description": "Missing required fields (verdict, final_state, execution, requires_review)"
+    },
+    {
+      "file": "invalid/envelope_wrong_state_mapping.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["envelope.verdict_consistency"],
+      "description": "PASS verdict with QUARANTINE final_state — inconsistent"
+    },
+    {
+      "file": "invalid/envelope_hce_mismatch.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["envelope.hce.H_total", "envelope.hce.phi"],
+      "description": "Aggregate H_total falsified (0.50 instead of correct 0.10)"
+    },
+    {
+      "file": "invalid/envelope_hce_out_of_range.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["plugin[0].H_range"],
+      "description": "Plugin H value 1.5 — out of [0,1] range"
+    },
+    {
+      "file": "invalid/bundle_wrong_type.json",
+      "type": "bundle",
+      "expected": "FAIL",
+      "expected_failures": ["bundle.type"],
+      "description": "Wrong type identifier on bundle"
+    },
+    {
+      "file": "invalid/envelope_wrong_type.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["envelope.type"],
+      "description": "Wrong type identifier on envelope"
+    }
+  ]
+}

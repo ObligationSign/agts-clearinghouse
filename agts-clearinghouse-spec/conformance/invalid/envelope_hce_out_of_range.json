@@ -1,0 +1,36 @@
+{
+  "_description": "Plugin H value is 1.5 — out of valid [0,1] range",
+  "_expected": "FAIL — HCE range check must detect out-of-range value",
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-bad-004",
+  "plugins": [
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "semantic_firewall",
+      "version": "2.0.0",
+      "transaction_id": "test-txn-bad-004",
+      "timestamp": 1700000000000,
+      "verdict": "BLOCK",
+      "H": 1.5,
+      "C": 0.90,
+      "E": 0.15,
+      "confidence": 0.85,
+      "evidence": { "hash": "abc" },
+      "metadata": {}
+    }
+  ],
+  "aggregate": {
+    "H_total": 1.0,
+    "C_total": 0.90,
+    "E_total": 0.15,
+    "phi": 0.0
+  },
+  "verdict": "BLOCK",
+  "final_state": "REFUSE",
+  "execution": "STOPPED",
+  "requires_review": false,
+  "timestamp": 1700000000001,
+  "policy_profile": "DEFAULT"
+}

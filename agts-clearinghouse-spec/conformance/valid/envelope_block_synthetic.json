@@ -1,0 +1,34 @@
+{
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-003-block",
+  "plugins": [
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "semantic_firewall",
+      "version": "0.0.0",
+      "transaction_id": "test-txn-003-block",
+      "timestamp": 1700000000000,
+      "verdict": "BLOCK",
+      "H": 1.0,
+      "C": 0.0,
+      "E": 1.0,
+      "confidence": 0.0,
+      "evidence": { "hash": "test-txn-003-block" },
+      "metadata": { "error": "plugin timeout", "synthetic": true }
+    }
+  ],
+  "aggregate": {
+    "H_total": 1.0,
+    "C_total": 0.001,
+    "E_total": 1.0,
+    "phi": 0.0
+  },
+  "verdict": "BLOCK",
+  "final_state": "REFUSE",
+  "execution": "STOPPED",
+  "requires_review": false,
+  "timestamp": 1700000000001,
+  "policy_profile": "DEFAULT"
+}

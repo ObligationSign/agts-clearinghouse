@@ -1,0 +1,49 @@
+{
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-002-review",
+  "plugins": [
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "semantic_firewall",
+      "version": "2.0.0",
+      "transaction_id": "test-txn-002-review",
+      "timestamp": 1700000000000,
+      "verdict": "PASS",
+      "H": 0.15,
+      "C": 0.85,
+      "E": 0.20,
+      "confidence": 0.80,
+      "evidence": { "hash": "sf001" },
+      "metadata": {}
+    },
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "finance",
+      "version": "1.1.0",
+      "transaction_id": "test-txn-002-review",
+      "timestamp": 1700000000001,
+      "verdict": "REVIEW",
+      "H": 0.20,
+      "C": 0.75,
+      "E": 0.30,
+      "confidence": 0.70,
+      "evidence": { "hash": "fin001" },
+      "metadata": {}
+    }
+  ],
+  "aggregate": {
+    "H_total": 0.18,
+    "C_total": 0.7984,
+    "E_total": 0.2575,
+    "phi": 0.4861
+  },
+  "verdict": "REVIEW",
+  "final_state": "QUARANTINE",
+  "execution": "WITHHELD",
+  "requires_review": true,
+  "timestamp": 1700000000002,
+  "policy_profile": "STRICT"
+}

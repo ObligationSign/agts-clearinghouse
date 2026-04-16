@@ -1,0 +1,18 @@
+{
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-004-empty",
+  "plugins": [],
+  "aggregate": {
+    "H_total": 0,
+    "C_total": 0,
+    "E_total": 0,
+    "phi": 0
+  },
+  "verdict": "REVIEW",
+  "final_state": "QUARANTINE",
+  "execution": "WITHHELD",
+  "requires_review": true,
+  "timestamp": 1700000000000,
+  "policy_profile": "DEFAULT"
+}

@@ -1,0 +1,15 @@
+{
+  "_description": "Missing required fields: verdict, final_state, execution, requires_review",
+  "_expected": "FAIL — schema check must detect missing fields",
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-bad-001",
+  "plugins": [],
+  "aggregate": {
+    "H_total": 0,
+    "C_total": 0,
+    "E_total": 0,
+    "phi": 0
+  },
+  "timestamp": 1700000000000
+}

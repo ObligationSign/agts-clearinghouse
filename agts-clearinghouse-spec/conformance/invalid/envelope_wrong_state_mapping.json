@@ -1,0 +1,36 @@
+{
+  "_description": "Verdict is PASS but final_state is QUARANTINE — inconsistent mapping",
+  "_expected": "FAIL — verdict consistency check must detect mismatch",
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "test-txn-bad-002",
+  "plugins": [
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "semantic_firewall",
+      "version": "2.0.0",
+      "transaction_id": "test-txn-bad-002",
+      "timestamp": 1700000000000,
+      "verdict": "PASS",
+      "H": 0.10,
+      "C": 0.90,
+      "E": 0.15,
+      "confidence": 0.85,
+      "evidence": { "hash": "abc" },
+      "metadata": {}
+    }
+  ],
+  "aggregate": {
+    "H_total": 0.10,
+    "C_total": 0.90,
+    "E_total": 0.15,
+    "phi": 0.765
+  },
+  "verdict": "PASS",
+  "final_state": "QUARANTINE",
+  "execution": "WITHHELD",
+  "requires_review": true,
+  "timestamp": 1700000000001,
+  "policy_profile": "DEFAULT"
+}

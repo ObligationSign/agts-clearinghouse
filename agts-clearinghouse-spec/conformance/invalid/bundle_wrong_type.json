@@ -1,0 +1,12 @@
+{
+  "_description": "Wrong type identifier — should be OCLAW_SOVEREIGN_BUNDLE_V1",
+  "_expected": "FAIL — type check must reject",
+  "type": "WRONG_BUNDLE_TYPE",
+  "version": "1.0",
+  "exported_at": "2024-01-15T10:30:00.000Z",
+  "exported_by": "operator@example.com",
+  "agent_id": "test-agent-001",
+  "profile": { "company_name": "Acme" },
+  "config_files": [],
+  "governance_provenance": {}
+}

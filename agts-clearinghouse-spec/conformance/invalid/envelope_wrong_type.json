@@ -1,0 +1,14 @@
+{
+  "_description": "Wrong type identifier — should be AGTS_GOVERNANCE_ENVELOPE_V1",
+  "_expected": "FAIL — type check must reject",
+  "type": "WRONG_ENVELOPE_TYPE",
+  "schema_version": "1",
+  "transaction_id": "test-txn-bad-005",
+  "plugins": [],
+  "aggregate": { "H_total": 0, "C_total": 0, "E_total": 0, "phi": 0 },
+  "verdict": "REVIEW",
+  "final_state": "QUARANTINE",
+  "execution": "WITHHELD",
+  "requires_review": true,
+  "timestamp": 1700000000000
+}
