@@ -1,6 +1,6 @@
 {
   "description": "AGTS V1 Conformance Test Manifest",
-  "version": "1.0",
+  "version": "2.0",
   "valid": [
     {
       "file": "valid/envelope_default_pass.json",
@@ -27,10 +27,58 @@
       "description": "Empty plugins array defaults to REVIEW"
     },
     {
+      "file": "valid/envelope_signed.json",
+      "type": "envelope",
+      "expected": "PASS",
+      "description": "Envelope with valid Ed25519 signature and leaf hash"
+    },
+    {
       "file": "valid/bundle_minimal.json",
       "type": "bundle",
       "expected": "PASS",
       "description": "Minimal valid sovereign bundle"
+    },
+    {
+      "file": "valid/bundle_with_hashes.json",
+      "type": "bundle",
+      "expected": "PASS",
+      "description": "Sovereign bundle with config file content hash verification"
+    },
+    {
+      "file": "valid/merkle_proof.json",
+      "type": "merkle_proof",
+      "expected": "PASS",
+      "description": "Merkle inclusion proof for leaf at index 1 in a 4-leaf tree"
+    },
+    {
+      "file": "valid/boundary_easy_tool.json",
+      "type": "boundary_classification",
+      "expected": "PASS",
+      "description": "Easy boundary matched by direct tool name"
+    },
+    {
+      "file": "valid/boundary_hard_keyword.json",
+      "type": "boundary_classification",
+      "expected": "PASS",
+      "description": "Hard boundary matched by keyword overlap (>= 30% threshold)"
+    },
+    {
+      "file": "valid/boundary_escalation.json",
+      "type": "boundary_classification",
+      "expected": "PASS",
+      "description": "Escalation rule matched by trigger word overlap (>= 40%)"
+    },
+    {
+      "file": "valid/boundary_priority.json",
+      "type": "boundary_classification",
+      "expected": "PASS",
+      "description": "Priority ordering: escalation takes precedence over matching easy boundary"
+    },
+    {
+      "file": "valid/boundary_default.json",
+      "type": "boundary_classification",
+      "expected": "PASS",
+      "description": "No boundary matches — classification defaults"
     }
   ],
   "invalid": [
@@ -75,6 +123,27 @@
       "expected": "FAIL",
       "expected_failures": ["envelope.type"],
       "description": "Wrong type identifier on envelope"
+    },
+    {
+      "file": "invalid/envelope_bad_signature.json",
+      "type": "envelope",
+      "expected": "FAIL",
+      "expected_failures": ["envelope.signature"],
+      "description": "Envelope with tampered Ed25519 signature"
+    },
+    {
+      "file": "invalid/merkle_bad_proof.json",
+      "type": "merkle_proof",
+      "expected": "FAIL",
+      "expected_failures": ["merkle.inclusion"],
+      "description": "Merkle inclusion proof with tampered sibling hash"
+    },
+    {
+      "file": "invalid/bundle_bad_hash.json",
+      "type": "bundle",
+      "expected": "FAIL",
+      "expected_failures": ["bundle.config_file[0].content_hash"],
+      "description": "Sovereign bundle with tampered config file content hash"
     }
   ]
 }
