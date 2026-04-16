@@ -1,0 +1,31 @@
+{
+  "_description": "No boundary matches. Classification: default, confidence: 0",
+  "_type": "boundary_classification",
+  "boundaries": {
+    "easy": [
+      {
+        "pattern": "Allow sending email",
+        "tools": [
+          "send_sovereign_mail"
+        ],
+        "keywords": [
+          "email",
+          "send"
+        ],
+        "classification": "auto_execute"
+      }
+    ],
+    "hard": [],
+    "escalation_rules": []
+  },
+  "tool_name": "memory_store",
+  "tool_input": {
+    "key": "test",
+    "value": "data"
+  },
+  "expected": {
+    "classification": "default",
+    "boundary_source": "default",
+    "confidence": 0
+  }
+}
