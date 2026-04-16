@@ -18,6 +18,8 @@ the clearinghouse enforces it, and the log makes it auditable.
 | [merkle-proof-v1.md](merkle-proof-v1.md) | Merkle Transparency Log — tamper-evident append-only log |
 | [sovereign-bundle-v1.md](sovereign-bundle-v1.md) | Sovereign Bundle (.oclaw) — portable agent identity artifact |
 | [decision-boundary-v1.md](decision-boundary-v1.md) | Decision Boundaries — human-defined action classification |
+| [execution-trace-v1.md](execution-trace-v1.md) | Execution Trace — record of governed action execution |
+| [variance-record-v1.md](variance-record-v1.md) | Variance Record — authorization-vs-execution drift measurement |
 
 ## Key Concepts
 
