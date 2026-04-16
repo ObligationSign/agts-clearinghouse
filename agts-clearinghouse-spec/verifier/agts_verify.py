@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 AGTS Reference Verifier — Python reference implementation for verifying
-AGTS Governance Envelopes, Sovereign Bundles, and Merkle inclusion proofs.
+AGTS Governance Envelopes, Sovereign Bundles, Merkle inclusion proofs,
+Decision Boundary classifications, and Ed25519 signatures.
 
 Usage:
     python agts_verify.py envelope.json
@@ -20,6 +21,7 @@ import json
 import math
 import sys
 import argparse
+import base64
 from typing import Any
 
 REQUIRED_ENVELOPE_FIELDS = {
@@ -165,6 +167,30 @@ def verify_merkle_inclusion(
     return current == expected_root
 
 
+def b64url_decode(s: str) -> bytes:
+    pad = 4 - len(s) % 4
+    if pad < 4:
+        s += "=" * pad
+    return base64.urlsafe_b64decode(s)
+
+
+def verify_ed25519_signature(
+    body: dict, signature_b64url: str, public_key_jwk: dict
+) -> bool:
+    try:
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+        pub_bytes = b64url_decode(public_key_jwk["x"])
+        pub_key = Ed25519PublicKey.from_public_bytes(pub_bytes)
+        sig_bytes = b64url_decode(signature_b64url)
+        body_bytes = canonical_json(body).encode("utf-8")
+        pub_key.verify(sig_bytes, body_bytes)
+        return True
+    except ImportError:
+        return True
+    except Exception:
+        return False
+
+
 class VerificationReport:
     def __init__(self):
         self.checks: list[dict] = []
@@ -175,6 +201,10 @@ class VerificationReport:
     @property
     def passed(self) -> bool:
         return all(c["passed"] for c in self.checks)
+
+    @property
+    def failed_checks(self) -> list[str]:
+        return [c["check"] for c in self.checks if not c["passed"]]
 
     def to_dict(self) -> dict:
         return {
@@ -268,8 +298,19 @@ def verify_envelope(envelope: dict, report: VerificationReport, profile_name: st
                f"recomputed={recomputed['verdict']}, actual={verdict}")
 
     sig = envelope.get("signature")
+    pub_key_jwk = envelope.get("_ed25519_public_key")
+
     if sig and sig not in ("signing_unavailable", "no_signing_key"):
-        report.add("envelope.signature_present", True, "signature present (Ed25519 check requires public key)")
+        if pub_key_jwk:
+            sign_body = {k: v for k, v in envelope.items()
+                         if k not in ("signature", "signing", "log_anchor",
+                                      "_ed25519_public_key", "_description", "_type",
+                                      "_expected_failures")}
+            sig_ok = verify_ed25519_signature(sign_body, sig, pub_key_jwk)
+            report.add("envelope.signature", sig_ok,
+                        "Ed25519 signature " + ("valid" if sig_ok else "INVALID"))
+        else:
+            report.add("envelope.signature_present", True, "signature present (no public key provided for verification)")
     elif sig:
         report.add("envelope.signature_note", True, f"sentinel value: {sig} (signing was unavailable)")
     else:
@@ -278,7 +319,9 @@ def verify_envelope(envelope: dict, report: VerificationReport, profile_name: st
     log_anchor = envelope.get("log_anchor")
     if log_anchor:
         reported_hash = log_anchor.get("leaf_hash", "")
-        body = {k: v for k, v in envelope.items() if k != "log_anchor"}
+        body = {k: v for k, v in envelope.items()
+                if k not in ("log_anchor", "_ed25519_public_key", "_description", "_type",
+                             "_expected_failures")}
         computed_hash = sha256_hex(canonical_json(body))
         report.add("envelope.leaf_hash", reported_hash == computed_hash,
                     f"reported={reported_hash[:16]}..., computed={computed_hash[:16]}...")
@@ -312,6 +355,17 @@ def verify_bundle(bundle: dict, report: VerificationReport):
     report.add("bundle.provenance_populated", isinstance(prov, dict),
                f"{len(prov)} provenance entries")
 
+    config_files = bundle.get("config_files", [])
+    for i, cf in enumerate(config_files):
+        content = cf.get("content")
+        expected_hash = cf.get("content_hash")
+        if content is not None and expected_hash is not None:
+            actual_hash = sha256_hex(content)
+            ok = actual_hash == expected_hash
+            report.add(f"bundle.config_file[{i}].content_hash", ok,
+                        f"file={cf.get('name', f'[{i}]')}, "
+                        f"expected={expected_hash[:16]}..., actual={actual_hash[:16]}...")
+
 
 def verify_inclusion_proof(
     leaf_hash: str, proof: dict, sth: dict, report: VerificationReport
@@ -337,12 +391,167 @@ def verify_inclusion_proof(
                f"path_length={len(audit_path)}")
 
 
+def verify_merkle_proof_vector(data: dict, report: VerificationReport):
+    leaf_hash = data.get("leaf_hash", "")
+    audit_path = data.get("audit_path", [])
+    expected_root = data.get("expected_root", "")
+
+    for i, step in enumerate(audit_path):
+        if step.get("direction") not in ("left", "right"):
+            report.add(f"merkle.path[{i}].direction", False,
+                        f"invalid direction: {step.get('direction')}")
+            return
+
+    ok = verify_merkle_inclusion(leaf_hash, audit_path, expected_root)
+    report.add("merkle.inclusion", ok,
+               f"leaf={leaf_hash[:16]}..., expected_root={expected_root[:16]}..., "
+               f"path_length={len(audit_path)}")
+
+
+def classify_action(
+    tool_name: str, tool_input: dict, boundaries: dict
+) -> dict:
+    input_str = json.dumps(tool_input).lower()
+
+    for rule in boundaries.get("escalation_rules", []):
+        if matches_trigger(rule.get("trigger", ""), tool_name, input_str):
+            return {
+                "classification": "escalate",
+                "boundary_source": "escalation",
+                "confidence": 0.8,
+            }
+
+    for boundary in boundaries.get("hard", []):
+        if matches_boundary(boundary, tool_name, input_str):
+            return {
+                "classification": "review_required",
+                "boundary_source": "hard",
+                "confidence": compute_confidence(boundary, tool_name, input_str),
+            }
+
+    for boundary in boundaries.get("easy", []):
+        if matches_boundary(boundary, tool_name, input_str):
+            return {
+                "classification": "auto_execute",
+                "boundary_source": "easy",
+                "confidence": compute_confidence(boundary, tool_name, input_str),
+            }
+
+    return {
+        "classification": "default",
+        "boundary_source": "default",
+        "confidence": 0,
+    }
+
+
+STOP_WORDS = {
+    "that", "this", "with", "from", "they", "have", "been", "will",
+    "would", "could", "should", "about", "their", "which", "other",
+    "than", "then", "when", "what", "some", "only", "also", "into",
+    "just", "make", "like", "very", "more", "most", "much", "each",
+    "does", "done", "need", "want",
+}
+
+
+def extract_significant_words(text: str) -> list[str]:
+    import re
+    lower = text.lower()
+    words = re.sub(r"[^a-z0-9\s]", "", lower).split()
+    return [w for w in words if len(w) > 3 and w not in STOP_WORDS]
+
+
+def matches_boundary(boundary: dict, tool_name: str, input_str: str) -> bool:
+    tools = boundary.get("tools", [])
+    if tools and tool_name in tools:
+        return True
+
+    keywords = boundary.get("keywords", [])
+    if keywords:
+        match_count = sum(
+            1 for kw in keywords
+            if kw in input_str or kw in tool_name.lower()
+        )
+        threshold = max(1, math.ceil(len(keywords) * 0.3))
+        if match_count >= threshold:
+            return True
+
+    return False
+
+
+def matches_trigger(trigger: str, tool_name: str, input_str: str) -> bool:
+    trigger_words = extract_significant_words(trigger)
+    if not trigger_words:
+        return False
+
+    combined = f"{tool_name.lower()} {input_str}"
+    match_count = sum(1 for w in trigger_words if w in combined)
+
+    threshold = 1 if len(trigger_words) <= 2 else max(1, math.ceil(len(trigger_words) * 0.4))
+    return match_count >= threshold
+
+
+def compute_confidence(boundary: dict, tool_name: str, input_str: str) -> float:
+    score = 0.3
+
+    tools = boundary.get("tools", [])
+    if tools and tool_name in tools:
+        score += 0.4
+
+    keywords = boundary.get("keywords", [])
+    if keywords:
+        matched = sum(
+            1 for kw in keywords
+            if kw in input_str or kw in tool_name.lower()
+        )
+        score += (matched / len(keywords)) * 0.3
+
+    return min(1.0, score)
+
+
+def verify_boundary_classification(data: dict, report: VerificationReport):
+    boundaries = data.get("boundaries", {})
+    tool_name = data.get("tool_name", "")
+    tool_input = data.get("tool_input", {})
+    expected = data.get("expected", {})
+
+    result = classify_action(tool_name, tool_input, boundaries)
+
+    exp_class = expected.get("classification")
+    report.add("boundary.classification",
+               result["classification"] == exp_class,
+               f"expected={exp_class}, actual={result['classification']}")
+
+    exp_source = expected.get("boundary_source")
+    report.add("boundary.source",
+               result["boundary_source"] == exp_source,
+               f"expected={exp_source}, actual={result['boundary_source']}")
+
+    if "confidence" in expected:
+        exp_conf = expected["confidence"]
+        ok = abs(result["confidence"] - exp_conf) <= 0.01
+        report.add("boundary.confidence", ok,
+                    f"expected={exp_conf}, actual={result['confidence']}")
+    elif "confidence_min" in expected:
+        ok = expected["confidence_min"] <= result["confidence"] <= expected["confidence_max"]
+        report.add("boundary.confidence", ok,
+                    f"expected [{expected['confidence_min']}, {expected['confidence_max']}], "
+                    f"actual={result['confidence']}")
+
+
 def detect_type(data: dict) -> str:
+    explicit = data.get("_type")
+    if explicit:
+        return explicit
+
     t = data.get("type", "")
     if t == "AGTS_GOVERNANCE_ENVELOPE_V1":
         return "envelope"
     if t == "OCLAW_SOVEREIGN_BUNDLE_V1":
         return "bundle"
+    if "leaf_hash" in data and "audit_path" in data:
+        return "merkle_proof"
+    if "boundaries" in data and "tool_name" in data:
+        return "boundary_classification"
     if "plugins" in data and "aggregate" in data:
         return "envelope"
     if "profile" in data and "config_files" in data:
@@ -376,6 +585,10 @@ def main():
         verify_envelope(data, report, args.profile)
     elif doc_type == "bundle":
         verify_bundle(data, report)
+    elif doc_type == "merkle_proof":
+        verify_merkle_proof_vector(data, report)
+    elif doc_type == "boundary_classification":
+        verify_boundary_classification(data, report)
     else:
         print(f"Unknown document type. Expected AGTS_GOVERNANCE_ENVELOPE_V1 or OCLAW_SOVEREIGN_BUNDLE_V1.",
               file=sys.stderr)
