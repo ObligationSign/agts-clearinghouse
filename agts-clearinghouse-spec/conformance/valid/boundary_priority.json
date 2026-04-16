@@ -1,0 +1,29 @@
+{
+  "_description": "Priority ordering: escalation rule takes precedence over matching easy boundary. Trigger words 'vulnerability' and 'production' both appear in combined string (2/4 significant words >= ceil(4*0.4)=2 threshold).",
+  "_type": "boundary_classification",
+  "boundaries": {
+    "easy": [
+      {
+        "pattern": "Allow vulnerability scans",
+        "tools": ["run_vulnerability_scan"],
+        "keywords": ["vulnerability", "scan"],
+        "classification": "auto_execute"
+      }
+    ],
+    "hard": [],
+    "escalation_rules": [
+      {
+        "trigger": "vulnerability scan against production systems",
+        "contact_email": "ciso@example.com",
+        "urgency": "high"
+      }
+    ]
+  },
+  "tool_name": "run_vulnerability_scan",
+  "tool_input": {"target": "production", "scope": "full"},
+  "expected": {
+    "classification": "escalate",
+    "boundary_source": "escalation",
+    "confidence": 0.8
+  }
+}
