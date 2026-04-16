@@ -186,7 +186,10 @@ def verify_ed25519_signature(
         pub_key.verify(sig_bytes, body_bytes)
         return True
     except ImportError:
-        return True
+        raise RuntimeError(
+            "Ed25519 signature verification requested but 'cryptography' "
+            "package is not installed. Install with: pip install cryptography"
+        )
     except Exception:
         return False
 
