@@ -1,0 +1,19 @@
+{
+  "_description": "Merkle inclusion proof with tampered sibling hash \u2014 verification must fail",
+  "_type": "merkle_proof",
+  "leaf_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "leaf_index": 1,
+  "tree_size": 4,
+  "audit_path": [
+    {
+      "hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "direction": "left"
+    },
+    {
+      "hash": "522b570f12151b2cee8ec1badd55634bd5580e9e46cee27f6c4c8ceee2ab97fc",
+      "direction": "right"
+    }
+  ],
+  "expected_root": "05a6d4566f0f17d31a6db0d9f7fad315ca3106d00e3f691a42fd92628d1293df",
+  "_expected_result": "FAIL"
+}
