@@ -1,0 +1,31 @@
+{
+  "_description": "Hard boundary matched by keyword overlap (>= 30% threshold). Classification: review_required",
+  "_type": "boundary_classification",
+  "boundaries": {
+    "easy": [],
+    "hard": [
+      {
+        "pattern": "Any file deletion or removal action",
+        "tools": [],
+        "keywords": [
+          "file",
+          "delete",
+          "removal",
+          "destroy"
+        ],
+        "classification": "review_required"
+      }
+    ],
+    "escalation_rules": []
+  },
+  "tool_name": "some_tool",
+  "tool_input": {
+    "action": "delete this file permanently"
+  },
+  "expected": {
+    "classification": "review_required",
+    "boundary_source": "hard",
+    "confidence_min": 0.3,
+    "confidence_max": 1.0
+  }
+}
