@@ -18,6 +18,8 @@ from agts_verify import (
     VerificationReport,
     verify_envelope,
     verify_bundle,
+    verify_merkle_proof_vector,
+    verify_boundary_classification,
     detect_type,
 )
 
@@ -40,8 +42,12 @@ def run_test(entry: dict) -> tuple[bool, str]:
         verify_envelope(data, report, profile)
     elif doc_type == "bundle":
         verify_bundle(data, report)
+    elif doc_type == "merkle_proof":
+        verify_merkle_proof_vector(data, report)
+    elif doc_type == "boundary_classification":
+        verify_boundary_classification(data, report)
     else:
-        return False, f"Could not detect document type"
+        return False, f"Could not detect document type: {doc_type}"
 
     expected = entry["expected"]
 
@@ -49,11 +55,11 @@ def run_test(entry: dict) -> tuple[bool, str]:
         if report.passed:
             return True, "All checks passed as expected"
         else:
-            failed = [c["check"] for c in report.checks if not c["passed"]]
+            failed = report.failed_checks
             return False, f"Expected PASS but got FAIL: {failed}"
     else:
         if not report.passed:
-            failed = [c["check"] for c in report.checks if not c["passed"]]
+            failed = report.failed_checks
             expected_failures = entry.get("expected_failures", [])
             if expected_failures:
                 missing = [f for f in expected_failures if f not in failed]
