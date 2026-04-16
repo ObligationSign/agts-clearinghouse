@@ -1,7 +1,7 @@
 # AGTS V1 — Open Format Specification
 
 This directory contains the open format specification for the Autonomous
-Governance Transition System (AGTS) V1.
+Governance Transparency Standard (AGTS) V1.
 
 AGTS defines how AI agent actions are governed: evaluated, scored, verdicted,
 signed, and recorded into a tamper-evident transparency log. The system creates
