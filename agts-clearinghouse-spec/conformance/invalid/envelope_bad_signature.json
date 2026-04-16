@@ -1,0 +1,52 @@
+{
+  "_description": "Governance envelope with tampered Ed25519 signature \u2014 verification must fail",
+  "_type": "envelope",
+  "_ed25519_public_key": {
+    "kty": "OKP",
+    "crv": "Ed25519",
+    "x": "akKEIzIu3ihRiL98W6m9lI0O2IjM4TVQVTZKubRS99g"
+  },
+  "_expected_failures": [
+    "envelope.signature"
+  ],
+  "type": "AGTS_GOVERNANCE_ENVELOPE_V1",
+  "schema_version": "1",
+  "transaction_id": "sig-test-001",
+  "plugins": [
+    {
+      "type": "AGTS_PLUGIN_RESULT_V1",
+      "schema_version": "1",
+      "plugin": "test_plugin",
+      "version": "1.0.0",
+      "transaction_id": "sig-test-001",
+      "timestamp": 1705320000000,
+      "verdict": "PASS",
+      "H": 0.1,
+      "C": 0.9,
+      "E": 0.15,
+      "confidence": 0.95,
+      "evidence": {
+        "hash": "abababababababababababababababababababababababababababababababab"
+      },
+      "metadata": {}
+    }
+  ],
+  "aggregate": {
+    "H_total": 0.1,
+    "C_total": 0.9,
+    "E_total": 0.15,
+    "phi": 0.6885
+  },
+  "verdict": "PASS",
+  "final_state": "ADMIT",
+  "execution": "EXECUTED",
+  "requires_review": false,
+  "timestamp": 1705320000000,
+  "policy_profile": "DEFAULT",
+  "signature": "uCAmH4ZDtRY5jiMUenjPXve9hDZDvxbB95R0iuuonBj1yeP6N4gEOX20u6iXo8wVYgE7RH-kHx75B-xY0wDOCA",
+  "signing": {
+    "alg": "Ed25519",
+    "key_id": "test-ed25519-key-001",
+    "signed_at": 1705320000000
+  }
+}
