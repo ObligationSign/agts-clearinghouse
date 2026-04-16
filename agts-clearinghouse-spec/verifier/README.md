@@ -1,12 +1,17 @@
 # AGTS Reference Verifier
 
 A standalone Python reference implementation for verifying AGTS Governance
-Envelopes, Sovereign Bundles, and Merkle inclusion proofs.
+Envelopes, Sovereign Bundles, Merkle inclusion proofs, Decision Boundary
+classifications, and Ed25519 signatures.
 
 ## Requirements
 
 - Python 3.10+
-- No external dependencies (standard library only)
+- `cryptography` package (required for Ed25519 signature verification)
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -54,8 +59,8 @@ python agts_verify.py envelope.json --profile STRICT
 - Schema compliance (all required fields present)
 - Type identifier correctness
 - Verdict/final_state/execution consistency
-- HCE aggregation recomputation (within ε = 0.0001)
-- Signature presence
+- HCE aggregation recomputation (within epsilon = 0.0001)
+- Ed25519 signature verification (fail-closed: errors if cryptography unavailable)
 - Leaf hash verification (if log_anchor present)
 
 ### Sovereign Bundle
@@ -63,10 +68,16 @@ python agts_verify.py envelope.json --profile STRICT
 - Required field presence
 - Signature presence
 - Profile and provenance population
+- Config file content hash verification
 
 ### Merkle Proof
 - Inclusion proof walk from leaf hash to tree root
 - Root hash comparison against signed tree head
+
+### Decision Boundary Classification
+- Easy/hard/escalation rule matching
+- Priority ordering (escalation > hard > easy > default)
+- Confidence scoring
 
 ## Conformance
 
