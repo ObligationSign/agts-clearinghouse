@@ -1,0 +1,46 @@
+{
+  "_description": "Sovereign bundle with config file content hashes for import verification",
+  "_type": "bundle",
+  "type": "OCLAW_SOVEREIGN_BUNDLE_V1",
+  "version": "1.0",
+  "exported_at": "2025-01-15T12:00:00Z",
+  "exported_by": "operator@example.com",
+  "agent_id": "agent-test-001",
+  "profile": {
+    "model": "gpt-4",
+    "temperature": "0.7"
+  },
+  "config_files": [
+    {
+      "name": "agent_config.json",
+      "content": "{\"model\":\"gpt-4\",\"temperature\":0.7}",
+      "content_hash": "343ad0978a63c5acea585a1fe48bc4318f8f950692f67ba4036337410a7a2611"
+    }
+  ],
+  "file_provenance": {
+    "agent_config.json": {
+      "transaction_id": "cfg-tx-001",
+      "leaf_hash": "abababababababababababababababababababababababababababababababab",
+      "timestamp": 1705320000000
+    }
+  },
+  "governance_provenance": {
+    "model": {
+      "transaction_id": "gov-tx-001",
+      "leaf_hash": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+      "timestamp": 1705320000000,
+      "verdict": "PASS"
+    }
+  },
+  "heartbeat_items": [],
+  "heartbeat_config": {
+    "frequency": "daily",
+    "style": "concise"
+  },
+  "signature": "no_signing_key",
+  "signing": {
+    "alg": "Ed25519",
+    "key_id": "test-key-001",
+    "signed_at": 1705320000000
+  }
+}
