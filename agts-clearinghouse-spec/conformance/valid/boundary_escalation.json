@@ -1,0 +1,37 @@
+{
+  "_description": "Escalation rule matched by trigger word overlap (>= 40%). Classification: escalate, confidence: 0.8",
+  "_type": "boundary_classification",
+  "boundaries": {
+    "easy": [
+      {
+        "pattern": "Allow reading files",
+        "tools": [
+          "read_file"
+        ],
+        "keywords": [
+          "read",
+          "file"
+        ],
+        "classification": "auto_execute"
+      }
+    ],
+    "hard": [],
+    "escalation_rules": [
+      {
+        "trigger": "Any security vulnerability scanning or penetration testing",
+        "contact_email": "security@example.com",
+        "urgency": "critical"
+      }
+    ]
+  },
+  "tool_name": "run_vulnerability_scan",
+  "tool_input": {
+    "target": "production",
+    "type": "penetration testing"
+  },
+  "expected": {
+    "classification": "escalate",
+    "boundary_source": "escalation",
+    "confidence": 0.8
+  }
+}
