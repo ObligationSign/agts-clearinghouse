@@ -1,11 +1,18 @@
 {
-  "_description": "Test vector for Merkle inclusion proof verification. The leaf hash, audit path, and expected root are computed using SHA-256 hex concatenation.",
-  "leaf_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "_description": "Merkle inclusion proof for leaf at index 1 in a 4-leaf tree. Audit path: sibling leaf[0] on left, then node(leaf[2]+leaf[3]) on right.",
+  "_type": "merkle_proof",
+  "leaf_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "leaf_index": 1,
+  "tree_size": 4,
   "audit_path": [
     {
-      "hash": "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
+      "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "direction": "left"
+    },
+    {
+      "hash": "522b570f12151b2cee8ec1badd55634bd5580e9e46cee27f6c4c8ceee2ab97fc",
       "direction": "right"
     }
   ],
-  "expected_root": "1fbde27cd307abc44dae61424395462404a82c5500f5c20f7a0db0bd91949e8b"
+  "expected_root": "05a6d4566f0f17d31a6db0d9f7fad315ca3106d00e3f691a42fd92628d1293df"
 }
